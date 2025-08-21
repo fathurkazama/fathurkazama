@@ -14,7 +14,7 @@ Saya seorang Web Developer & Cyber Security Enthusiast.
 -   Website: https://my.fathurkazama.id
 -   Facebook: https://facebook.com/fathur.yt.7
 
-### 💡 Quote of the Day
+### (0-)
 <!--START_QUOTE-->
 ... 
 <!--END_QUOTE-->
