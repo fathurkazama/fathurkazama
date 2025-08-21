@@ -17,17 +17,15 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      - name: Update Random Quote
+      - name: Fetch and Update Quote
         run: |
           QUOTELINE=$(curl -s https://api.quotable.io/random | jq -r '"> \( .content ) - **\( .author )**"')
           README_PATH="README.md"
           
-          # Cek apakah placeholder sudah ada
-          if grep -q "" "$README_PATH"; then
-              sed -i '//,//c\\n'"$QUOTELINE"'\n\n' "$README_PATH"
-          else
-              echo -e "\n$QUOTELINE" >> "$README_PATH"
-          fi
+          # Gunakan sed untuk mengganti konten di antara placeholder
+          sed -i '//r/dev/stdin' "$README_PATH" <<< "$QUOTELINE"
+          sed -i '//,//s/.*//' "$README_PATH"
+          sed -i 's//'"\n$QUOTELINE"'/g' "$README_PATH"
           
       - name: Commit & Push changes
         run: |
@@ -36,10 +34,3 @@ jobs:
           git add README.md
           git commit -m "Update random quote" || echo "No changes to commit"
           git push
-    ```
-
-6.  Setelah selesai, klik tombol **"Commit changes"** di bagian bawah.
-
-Setelah Anda melakukan ini, **Anda akan melihat tombol `Run workflow`** di halaman `Actions` Anda. Selain itu, **setiap kali Anda membuat perubahan (commit)**, quote akan otomatis diperbarui.
-
-Maaf banget ya, Bro, atas kesalahan ini. Silakan coba lagi dan beri tahu saya kalau masih ada masalah.
