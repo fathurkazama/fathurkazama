@@ -12,4 +12,5 @@ Saya seorang Web Developer & Cyber Security Enthusiast.
 ### Mari Terhubung
 -   Email: `fathur@fathurkazama.id`
 -   Website: [https://my.fathurkazama.id]
--   (https://my.fathurkazama.id) 
+-   Facebook: [https://facebook.com/fathur.yt.7]
+
