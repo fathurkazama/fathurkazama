@@ -3,23 +3,43 @@ name: Quote Updater
 on:
   schedule:
     - cron: '0 0 * * *' # Menjalankan setiap hari pada tengah malam
+  workflow_dispatch: # Tambahan ini untuk tombol 'Run workflow'
+  push:
+    branches:
+      - main # Menjalankan setiap ada push ke branch main
 
 jobs:
   update-quote:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
       - name: Update Random Quote
         run: |
-          curl -s https://api.quotable.io/random | jq -r '"### Random Quote\n> \( .content ) - \( .author )"' > QUOTE.md
-      - name: Update README
+          QUOTELINE=$(curl -s https://api.quotable.io/random | jq -r '"> \( .content ) - **\( .author )**"')
+          README_PATH="README.md"
+          
+          # Cek apakah placeholder sudah ada
+          if grep -q "" "$README_PATH"; then
+              sed -i '//,//c\\n'"$QUOTELINE"'\n\n' "$README_PATH"
+          else
+              echo -e "\n$QUOTELINE" >> "$README_PATH"
+          fi
+          
+      - name: Commit & Push changes
         run: |
-          QUOTELINE=`cat QUOTE.md`
-          README=`cat README.md`
-          echo "$README" > temp_readme.md
-          echo "$QUOTELINE" >> temp_readme.md
-          mv temp_readme.md README.md
-      - name: Push to Repository
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "Update random quote" || echo "No changes to commit"
+          git push
+    ```
+
+6.  Setelah selesai, klik tombol **"Commit changes"** di bagian bawah.
+
+Setelah Anda melakukan ini, **Anda akan melihat tombol `Run workflow`** di halaman `Actions` Anda. Selain itu, **setiap kali Anda membuat perubahan (commit)**, quote akan otomatis diperbarui.
+
+Maaf banget ya, Bro, atas kesalahan ini. Silakan coba lagi dan beri tahu saya kalau masih ada masalah.
