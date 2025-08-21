@@ -1,0 +1,25 @@
+name: Quote Updater
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Menjalankan setiap hari pada tengah malam
+
+jobs:
+  update-quote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Update Random Quote
+        run: |
+          curl -s https://api.quotable.io/random | jq -r '"### Random Quote\n> \( .content ) - \( .author )"' > QUOTE.md
+      - name: Update README
+        run: |
+          QUOTELINE=`cat QUOTE.md`
+          README=`cat README.md`
+          echo "$README" > temp_readme.md
+          echo "$QUOTELINE" >> temp_readme.md
+          mv temp_readme.md README.md
+      - name: Push to Repository
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
