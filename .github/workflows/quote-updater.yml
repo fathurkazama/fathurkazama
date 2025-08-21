@@ -12,21 +12,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Fetch Random Quote
-        id: quote
+      - name: Get a new quote
+        id: get_quote
         run: |
           QUOTE=$(curl -s https://api.quotable.io/random | jq -r '"> **\(.content)** — _\(.author)_"')
           echo "::set-output name=quote::${QUOTE}"
       
       - name: Update README.md
-        uses: c-hive/gha-commit-action@v2.0.0
-        with:
-          commit_message: "Update quote of the day"
-          file_path: README.md
-          content: ${{ steps.quote.outputs.quote }}
-          replacer: ".*"
-
-      - name: Commit and Push
+        run: |
+          START_MARKER=""
+          END_MARKER=""
+          README_FILE="README.md"
+          
+          # Baca konten README.md
+          CONTENT=$(cat "$README_FILE")
+          
+          # Hapus konten lama
+          UPDATED_CONTENT=$(echo "$CONTENT" | sed "/$START_MARKER/,/$END_MARKER/c\\$START_MARKER\n${QUOTE}\n$END_MARKER")
+          
+          # Tulis konten baru
+          echo "$UPDATED_CONTENT" > "$README_FILE"
+      
+      - name: Commit & Push changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
