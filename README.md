@@ -15,7 +15,9 @@ Saya seorang Web Developer & Cyber Security Enthusiast.
 -   Facebook: https://facebook.com/fathur.yt.7
 
 ### 💡 Quote of the Day
+<!--START_QUOTE-->
 
+<!--END_QUOTE-->
 
 
 
