@@ -1,36 +1,35 @@
-name: Quote Updater
+name: Update Profile README
 
 on:
   schedule:
     - cron: '0 0 * * *' # Menjalankan setiap hari pada tengah malam
-  workflow_dispatch: # Tambahan ini untuk tombol 'Run workflow'
-  push:
-    branches:
-      - main # Menjalankan setiap ada push ke branch main
+  workflow_dispatch:
 
 jobs:
-  update-quote:
+  update-readme:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          persist-credentials: false
-          fetch-depth: 0
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-      - name: Fetch and Update Quote
+      - name: Fetch Random Quote
+        id: quote
         run: |
-          QUOTELINE=$(curl -s https://api.quotable.io/random | jq -r '"> \( .content ) - **\( .author )**"')
-          README_PATH="README.md"
-          
-          # Gunakan sed untuk mengganti konten di antara placeholder
-          sed -i '//r/dev/stdin' "$README_PATH" <<< "$QUOTELINE"
-          sed -i '//,//s/.*//' "$README_PATH"
-          sed -i 's//'"\n$QUOTELINE"'/g' "$README_PATH"
-          
-      - name: Commit & Push changes
+          QUOTE=$(curl -s https://api.quotable.io/random | jq -r '"> **\(.content)** — _\(.author)_"')
+          echo "::set-output name=quote::${QUOTE}"
+      
+      - name: Update README.md
+        uses: c-hive/gha-commit-action@v2.0.0
+        with:
+          commit_message: "Update quote of the day"
+          file_path: README.md
+          content: ${{ steps.quote.outputs.quote }}
+          replacer: ".*"
+
+      - name: Commit and Push
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add README.md
-          git commit -m "Update random quote" || echo "No changes to commit"
+          git commit -m "Update quote of the day" || echo "No changes to commit"
           git push
