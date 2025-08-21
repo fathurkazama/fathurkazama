@@ -19,5 +19,24 @@ Saya seorang Web Developer & Cyber Security Enthusiast.
 
 <!--END_QUOTE-->
 
+- name: Update README.md
+  run: |
+    START_MARKER="<!--START_QUOTE-->"
+    END_MARKER="<!--END_QUOTE-->"
+    README_FILE="README.md"
 
+    QUOTE="${{ steps.get_quote.outputs.quote }}"
+
+    # Pastikan quote nggak kosong
+    if [ -z "$QUOTE" ]; then
+      echo "No quote fetched!"
+      exit 1
+    fi
+
+    # Gunakan awk biar lebih aman daripada sed
+    awk -v start="$START_MARKER" -v end="$END_MARKER" -v q="$QUOTE" '
+      $0 ~ start {print; print q; f=1; next}
+      $0 ~ end {print; f=0; next}
+      !f {print}
+    ' "$README_FILE" > tmp && mv tmp "$README_FILE"
 
